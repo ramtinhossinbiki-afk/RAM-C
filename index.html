@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>RAM C | RAMTIN CIRCLE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, 'Vazir', sans-serif;
+        }
+
+        body {
+            background: #fffef7;
+            padding: 2rem 1.5rem;
+            color: #2d3e50;
+        }
+
+        /* تم سفید و لیمویی ملایم (همانند کد قبلی) */
+        .card {
+            background: #ffffff;
+            border-radius: 1.75rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.02), 0 2px 6px rgba(255,200,100,0.1);
+            border: 1px solid #fff0d6;
+            padding: 1.8rem;
+        }
+
+        .btn {
+            background: #fffcf5;
+            border: 1px solid #ffe2b5;
+            padding: 0.7rem 1.6rem;
+            border-radius: 2.5rem;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: #b97f2e;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #f9e0a0;
+            border: none;
+            color: #784a0e;
+            box-shadow: 0 2px 4px rgba(249, 200, 100, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: #f7d97e;
+            transform: translateY(-1px);
+        }
+
+        .btn-warning {
+            background: #fff3e6;
+            border-color: #ffd8a3;
+            color: #bd7a24;
+        }
+
+        .btn-warning:hover {
+            background: #ffebd6;
+        }
+
+        .btn-danger {
+            background: #fff0e6;
+            border-color: #ffcca3;
+            color: #c2591a;
+        }
+        .btn-danger:hover {
+            background: #ffe6d5;
+        }
+
+        h1 {
+            font-weight: 700;
+            color: #c8821f;
+            letter-spacing: -0.3px;
+        }
+
+        .config-panel {
+            background: #fffef9;
+            border-radius: 1.25rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #fff0df;
+        }
+
+        .participant-inputs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 1rem 0;
+            align-items: center;
+        }
+
+        .participant-inputs input {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            border: 1px solid #ffe2bc;
+            background: #fffefb;
+            font-size: 0.85rem;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .participant-inputs input:focus {
+            border-color: #f5cd8a;
+        }
+
+        .name-fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.8rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .name-field-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #fffef7;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            border: 1px solid #fff0e2;
+        }
+        .name-field-item label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #b97f2e;
+            background: #fff4e8;
+            padding: 0.2rem 0.6rem;
+            border-radius: 2rem;
+        }
+        .name-field-item input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 0.5rem 0;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .wheel-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        canvas {
+            max-width: 100%;
+            width: 100%;
+            height: auto;
+            background: #fefaf2;
+            border-radius: 50%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid #ffe6c4;
+            cursor: pointer;
+        }
+
+        .pointer {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #e5a12e;
+            position: relative;
+            top: -10px;
+            margin-bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            z-index: 2;
+        }
+
+        .winner-area {
+            background: #fff9ef;
+            border-radius: 2rem;
+            padding: 0.8rem 1.2rem;
+            text-align: center;
+            margin: 1rem 0;
+            border: 1px solid #ffe2bc;
+        }
+
+        .winner-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #c8821f;
+        }
+
+        .participants-list {
+            background: #fffef5;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            margin: 1rem 0;
+            border: 1px solid #fff0e2;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .participant-badge {
+            display: inline-block;
+            background: #fef3e6;
+            margin: 0.2rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            border-right: 3px solid #e5a12e;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.7rem;
+            color: #bfae95;
+            border-top: 1px solid #fff0e2;
+            padding-top: 1rem;
+        }
+
+        @media (max-width: 550px) {
+            body { padding: 1rem; }
+            .card { padding: 1rem; }
+            .btn { padding: 0.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 1rem;">
+        <div>
+            <h1>RAM C</h1>
+            <span style="font-size:0.7rem; color:#cc9a5c;">RAMTIN CIRCLE · گردونه شانس</span>
+        </div>
+        <div>
+            <a href="https://github.com/ramtinhossinbiki" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                <button class="btn" style="background:#f5f0e8;">🐙 گیت‌هاب</button>
+            </a>
+        </div>
+    </div>
+
+    <!-- بخش تنظیمات تعداد و نام شرکت‌کنندگان -->
+    <div class="config-panel">
+        <div style="display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center;">
+            <span style="font-size:0.8rem;">تعداد شرکت‌کنندگان:</span>
+            <input type="number" id="participantCount" min="1" max="24" value="6" style="width: 80px;" class="btn-outline">
+            <button id="generateNameFieldsBtn" class="btn">ایجاد فرم نام‌ها</button>
+            <button id="buildWheelBtn" class="btn btn-primary">ساخت گردونه</button>
+        </div>
+        <div id="nameFieldsContainer" class="name-fields" style="margin-top: 1rem;">
+            <!-- داینامیک: فیلدهای ورودی اسم در اینجا ساخته می‌شوند -->
+        </div>
+        <div style="font-size:0.7rem; color:#ba8b48; margin-top: 0.5rem;">※ نام‌ها را وارد کنید (خالی گذاشتید = شماره خودکار)</div>
+    </div>
+
+    <!-- گردونه و نشانگر -->
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <canvas id="wheelCanvas" width="500" height="500" style="max-width: 500px; width: 100%; aspect-ratio: 1/1;"></canvas>
+    </div>
+
+    <!-- دکمه‌های اصلی -->
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin: 1rem 0;">
+        <button id="spinBtn" class="btn btn-primary">🎡 چرخاندن گردونه</button>
+        <button id="removeWinnerBtn" class="btn btn-danger">🗑️ حذف برنده از گردونه</button>
+        <button id="resetWheelBtn" class="btn btn-warning">🔄 بازنشانی گردونه (بدون تغییر اسامی)</button>
+    </div>
+
+    <!-- نمایش برنده -->
+    <div class="winner-area" id="winnerArea">
+        <div style="font-size:0.8rem; color:#b87a2e;">برندهٔ این چرخش:</div>
+        <div class="winner-name" id="winnerNameDisplay">---</div>
+    </div>
+
+    <!-- لیست شرکت‌کنندگان فعلی با رنگ -->
+    <div class="participants-list" id="participantsList">
+        <span style="font-size:0.7rem;">📋 لیست شرکت‌کنندگان (با رنگ گردونه):</span>
+        <div id="participantsBadges"></div>
+    </div>
+
+    <footer>
+        🔄 هر بار چرخش، برنده مشخص می‌شود · با حذف برنده، گردونه به‌روز می‌شود · طراحی الهام گرفته از RAM C
+    </footer>
+</div>
+
+<script>
+    (function(){
+        // ---------- DOM elements ----------
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const participantCountInput = document.getElementById('participantCount');
+        const generateBtn = document.getElementById('generateNameFieldsBtn');
+        const buildWheelBtn = document.getElementById('buildWheelBtn');
+        const spinBtn = document.getElementById('spinBtn');
+        const removeWinnerBtn = document.getElementById('removeWinnerBtn');
+        const resetWheelBtn = document.getElementById('resetWheelBtn');
+        const nameFieldsContainer = document.getElementById('nameFieldsContainer');
+        const winnerNameDisplay = document.getElementById('winnerNameDisplay');
+        const participantsBadgesDiv = document.getElementById('participantsBadges');
+
+        // ---------- متغیرهای اصلی ----------
+        let participants = [];       // [{ name, color }]
+        let currentRotation = 0;    // رادیان
+        let spinning = false;
+        let animationId = null;
+        let lastWinnerIndex = -1;    // آخرین برنده (برای حذف)
+        let spinStartTime = 0;
+        let spinDuration = 1800;      // 1.8 ثانیه
+        let startRotation = 0;
+        let targetRotation = 0;
+        
+        // پالت رنگ‌های شاد و لیمویی (خودکار بر اساس اندیس)
+        const colorPalette = [
+            '#F9E0A0', '#F7D97E', '#FCE6B4', '#FFE2BC', '#FFE6C4', '#FEF0DF',
+            '#FFEED5', '#FDE8C8', '#FFEDC9', '#FDDFA5', '#FFE0B3', '#FFD9A3',
+            '#FFD6A0', '#FFE0BA', '#FFE4C2', '#FFEACE', '#F7E1B0', '#FCE0A8'
+        ];
+        
+        // ابزار کمکی
+        function getColorForIndex(idx) {
+            return colorPalette[idx % colorPalette.length];
+        }
+
+        // ایجاد فیلدهای ورودی بر اساس تعداد
+        function generateNameInputs() {
+            let count = parseInt(participantCountInput.value);
+            if (isNaN(count) || count < 1) count = 1;
+            if (count > 24) count = 24;
+            participantCountInput.value = count;
+            
+            let html = '';
+            for (let i = 0; i < count; i++) {
+                html += `
+                    <div class="name-field-item">
+                        <label>${i+1}</label>
+                        <input type="text" id="name_${i}" placeholder="نام شرکت‌کننده ${i+1}" value="شرکت‌کننده ${i+1}">
+                    </div>
+                `;
+            }
+            nameFieldsContainer.innerHTML = html;
+        }
+        
+        // خواندن نام‌ها از فیلدها و ساخت آرایه participants (و اختصاص رنگ)
+        function buildParticipantsFromInputs() {
+            const inputs = nameFieldsContainer.querySelectorAll('input');
+            if (inputs.length === 0) {
+                generateNameInputs(); // اگر خالی بود یکبار بساز
+            }
+            const newParticipants = [];
+            const currentInputs = nameFieldsContainer.querySelectorAll('input');
+            for (let i = 0; i < currentInputs.length; i++) {
+                let rawName = currentInputs[i].value.trim();
+                if (rawName === "") rawName = `شرکت‌کننده ${i+1}`;
+                newParticipants.push({
+                    name: rawName,
+                    color: getColorForIndex(i)
+                });
+            }
+            if (newParticipants.length === 0) {
+                newParticipants.push({ name: "شرکت‌کننده 1", color: getColorForIndex(0) });
+            }
+            participants = newParticipants;
+            // بعد از ساخت گردونه، چرخش و برنده قبلی را ریست می‌کنیم
+            lastWinnerIndex = -1;
+            winnerNameDisplay.innerText = "---";
+            currentRotation = 0;
+            drawWheel();
+            updateParticipantsBadges();
+        }
+        
+        // بروزرسانی نمایش لیست شرکت‌کنندگان در پایین
+        function updateParticipantsBadges() {
+            if (!participants.length) {
+                participantsBadgesDiv.innerHTML = '<span style="color:#ba8b48;">هیچ شرکت‌کننده‌ای وجود ندارد. لطفاً گردونه را بسازید.</span>';
+                return;
+            }
+            let badges = '';
+            participants.forEach((p, idx) => {
+                badges += `<span class="participant-badge" style="background:${p.color}80; border-right-color:${p.color}">${idx+1} - ${escapeHtml(p.name)}</span>`;
+            });
+            participantsBadgesDiv.innerHTML = badges;
+        }
+        
+        // ساده برای امنیت
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // رسم گردونه با زاویه چرخش فعلی (currentRotation)
+        function drawWheel() {
+            const size = canvas.width;
+            const centerX = size/2;
+            const centerY = size/2;
+            const radius = size/2 - 8;
+            if (!ctx) return;
+            if (!participants.length) {
+                ctx.clearRect(0, 0, size, size);
+                ctx.font = "bold 16px 'Vazir', sans-serif";
+                ctx.fillStyle = "#cc9a5c";
+                ctx.textAlign = "center";
+                ctx.fillText("⏺ ابتدا گردونه را بسازید", centerX, centerY);
+                return;
+            }
+            const count = participants.length;
+            const angleStep = (Math.PI * 2) / count;
+            const startAngleOffset = currentRotation; // کل گردونه می‌چرخد
+            for (let i = 0; i < count; i++) {
+                const start = i * angleStep + startAngleOffset;
+                const end = (i+1) * angleStep + startAngleOffset;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, start, end);
+                ctx.lineTo(centerX, centerY);
+                ctx.fillStyle = participants[i].color;
+                ctx.fill();
+                ctx.strokeStyle = "#fff0d6";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(start + angleStep/2);
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                const textRadius = radius * 0.7;
+                ctx.font = `bold ${Math.max(14, Math.floor(radius/8))}px 'Vazir', 'Segoe UI'`;
+                ctx.fillStyle = "#784a0e";
+                ctx.shadowBlur = 0;
+                // نمایش شماره شرکت‌کننده (داخل هر برش عدد)
+                const numberText = (i+1).toString();
+                ctx.fillText(numberText, textRadius, 6);
+                ctx.restore();
+            }
+            // دایره مرکزی زیبا
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 0.12, 0, 2*Math.PI);
+            ctx.fillStyle = "#f9e0a0";
+            ctx.fill();
+            ctx.strokeStyle = "#dba543";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        
+        // تعیین برنده بر اساس زاویه چرخش فعلی (نشانگر در بالا ثابت است: جهت -PI/2)
+        function getWinnerIndexFromRotation() {
+            if (!participants.length) return -1;
+            const count = participants.length;
+            const angleStep = (Math.PI * 2) / count;
+            // زاویه نشانگر ثابت (بالای دایره) = -PI/2 (یعنی 12 ساعت)
+            const pointerAngle = -Math.PI / 2;
+            // تبدیل به زاویه مختصات گردونه : با در نظر گرفتن چرخش فعلی
+            let localAngle = pointerAngle - currentRotation;
+            // نرمال‌سازی به [0, 2PI)
+            localAngle = ((localAngle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+            const index = Math.floor(localAngle / angleStep) % count;
+            return index;
+        }
+        
+        // نمایش برنده در UI
+        function showWinner() {
+            if (!participants.length) {
+                winnerNameDisplay.innerText = "بدون شرکت‌کننده!";
+                return;
+            }
+            const idx = getWinnerIndexFromRotation();
+            if (idx >= 0 && idx < participants.length) {
+                lastWinnerIndex = idx;
+                winnerNameDisplay.innerText = participants[idx].name;
+                // جلوه لاکچری
+                winnerNameDisplay.style.transform = "scale(1.03)";
+                setTimeout(() => { winnerNameDisplay.style.transform = ""; }, 300);
+            } else {
+                winnerNameDisplay.innerText = "خطا در تشخیص";
+                lastWinnerIndex = -1;
+            }
+        }
+        
+        // انیمیشن چرخش
+        function animateSpin(timestamp) {
+            if (!spinning) return;
+            const elapsed = timestamp - spinStartTime;
+            let t = Math.min(1, elapsed / spinDuration);
+            // easing cubic out
+            const easeOut = 1 - Math.pow(1 - t, 3);
+            const newRotation = startRotation + (targetRotation - startRotation) * easeOut;
+            currentRotation = newRotation % (2*Math.PI);
+            drawWheel();
+            if (t < 1) {
+                animationId = requestAnimationFrame(animateSpin);
+            } else {
+                // پایان چرخش
+                currentRotation = targetRotation % (2*Math.PI);
+                drawWheel();
+                spinning = false;
+                animationId = null;
+                showWinner();
+                spinBtn.disabled = false;
+                removeWinnerBtn.disabled = false;
+            }
+        }
+        
+        // چرخاندن گردونه با چرخش تصادفی
+        function spinWheel() {
+            if (spinning) {
+                alert("لطفاً صبر کنید، گردونه در حال چرخش است!");
+                return;
+            }
+            if (!participants.length) {
+                alert("لطفا ابتدا با دکمه «ساخت گردونه» شرکت‌کننده‌ها را تعریف کنید.");
+                return;
+            }
+            // جلوگیری از چرخش همزمان
+            spinBtn.disabled = true;
+            removeWinnerBtn.disabled = true;
+            // تولید چرخش تصادفی بین 5 تا 12 دور (به رادیان)
+            const minRot = 5 * 2 * Math.PI;
+            const maxRot = 12 * 2 * Math.PI;
+            const randomAdd = minRot + Math.random() * (maxRot - minRot);
+            const currentBase = currentRotation;
+            targetRotation = currentBase + randomAdd;
+            startRotation = currentBase;
+            spinStartTime = performance.now();
+            spinning = true;
+            animationId = requestAnimationFrame(animateSpin);
+        }
+        
+        // حذف برنده از آرایه participants و به روزرسانی همه چیز
+        function removeWinner() {
+            if (spinning) {
+                alert("ابتدا صبر کنید چرخش تمام شود.");
+                return;
+            }
+            if (lastWinnerIndex === -1 || lastWinnerIndex >= participants.length || participants.length === 0) {
+                alert("هیچ برنده‌ای برای حذف وجود ندارد! لطفاً ابتدا گردونه را بچرخانید.");
+                return;
+            }
+            const winnerName = participants[lastWinnerIndex].name;
+            if (confirm(`آیا برنده "${winnerName}" از گردونه حذف شود؟`)) {
+                // حذف برنده
+                participants.splice(lastWinnerIndex, 1);
+                if (participants.length === 0) {
+                    winnerNameDisplay.innerText = "همه حذف شدند!";
+                    lastWinnerIndex = -1;
+                    drawWheel();
+                    updateParticipantsBadges();
+                    // همچنین فیلدهای نام را همگام‌سازی می‌کنیم (برای نمایش در بخش فرم)
+                    syncNameInputsWithParticipants();
+                    alert("تمامی شرکت‌کنندگان حذف شدند. لطفاً شرکت‌کننده جدید اضافه کنید.");
+                    return;
+                }
+                // رنگ‌ها را مجدداً به ترتیب اختصاص بده (برای هماهنگی)
+                for (let i = 0; i < participants.length; i++) {
+                    participants[i].color = getColorForIndex(i);
+                }
+                // بروزرسانی فیلدهای ورودی نام تا با لیست جدید همخوانی داشته باشد
+                syncNameInputsWithParticipants();
+                // بازنشانی چرخش و برنده
+                currentRotation = 0;
+                lastWinnerIndex = -1;
+                winnerNameDisplay.innerText = "---";
+                drawWheel();
+                updateParticipantsBadges();
+                alert(`برنده "${winnerName}" از گردونه حذف شد. اکنون ${participants.length} شرکت‌کننده باقی مانده.`);
+            }
+        }
+        
+        // همگام‌سازی فیلدهای متنی با آرایه participants (برای نمایش صحیح در فرم)
+        function syncNameInputsWithParticipants() {
+            const container = nameFieldsContainer;
+            let html = '';
+            for (let i = 0; i < participants.length; i++) {
+                html += `
+                    <div class="name-field-item">
+                        <label>${i+1}</label>
+                        <input type="text" id="name_${i}" value="${escapeHtml(participants[i].name)}" placeholder="نام شرکت‌کننده ${i+1}">
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+            // تعداد شرکت‌کننده را در فیلد بالا هم اصلاح کن
+            participantCountInput.value = participants.length;
+        }
+        
+        // بازنشانی گردونه بدون تغییر اسامی (فقط زاویه و برنده و نمایش)
+        function resetWheelState() {
+            if (spinning) return;
+            currentRotation = 0;
+            lastWinnerIndex = -1;
+            winnerNameDisplay.innerText = "---";
+            drawWheel();
+        }
+        
+        // ساخت گردونه از روی فیلدهای فعلی (خواندن اسامی و بازسازی)
+        function rebuildWheelFromInputs() {
+            if (spinning) {
+                alert("گردونه در حال چرخش است، لطفاً بعد از توقف مجدداً تلاش کنید.");
+                return;
+            }
+            buildParticipantsFromInputs();  // participants و رنگها و لیست ساخته میشود
+            // همگام‌سازی فیلدها با اسامی جدید (فقط در صورتی که از فیلدها خوانده شده)
+            syncNameInputsWithParticipants();
+            currentRotation = 0;
+            lastWinnerIndex = -1;
+            winnerNameDisplay.innerText = "---";
+            drawWheel();
+            updateParticipantsBadges();
+        }
+        
+        // رویدادها
+        generateBtn.addEventListener('click', () => {
+            if (spinning) return;
+            generateNameInputs();
+        });
+        
+        buildWheelBtn.addEventListener('click', () => {
+            rebuildWheelFromInputs();
+        });
+        
+        spinBtn.addEventListener('click', () => {
+            spinWheel();
+        });
+        
+        removeWinnerBtn.addEventListener('click', () => {
+            removeWinner();
+        });
+        
+        resetWheelBtn.addEventListener('click', () => {
+            resetWheelState();
+        });
+        
+        // مقداردهی اولیه: ایجاد ۶ فیلد پیشفرض و ساخت گردونه
+        function init() {
+            generateNameInputs();
+            buildParticipantsFromInputs();
+            drawWheel();
+            updateParticipantsBadges();
+        }
+        
+        init();
+        
+        // تنظیم canvas برای نمایش درست در اندازه‌های مختلف
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const maxWidth = Math.min(500, container.clientWidth);
+            canvas.style.width = `${maxWidth}px`;
+            canvas.style.height = `${maxWidth}px`;
+            canvas.width = maxWidth;
+            canvas.height = maxWidth;
+            drawWheel();
+        }
+        window.addEventListener('resize', () => { resizeCanvas(); });
+        resizeCanvas();
+    })();
+</script>
+</body>
+</html>
